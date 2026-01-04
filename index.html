@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Portfolio</title>
+
+<!-- Fonts ต้องอยู่ใน head เท่านั้น -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ===== RESET TOP SPACE ===== */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden; /* ⭐ กันเลื่อนซ้ายขวา */
+}
+
+body {
+    background: transparent;
+    color: #fff;
+    font-family: 'Inter', Helvetica, Arial, sans-serif;
+    line-height: 1.7;
+}
+
+
+* { box-sizing: border-box; }
+body { margin:0; background:transparent; color:#fff; font-family:Helvetica, Arial, sans-serif; }
+/* ===== Background Video ===== */
+.bg-video {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    overflow: hidden;
+}
+
+.bg-video video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ฟิลเตอร์ทับให้เนื้อหาอ่านง่าย */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: -1;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;      /* เต็ม viewport */
+    margin: 0;          /* ⭐ ตัดช่องว่าง */
+    padding: 0;         /* ⭐ ตัดช่องว่าง */
+    background: #000;
+    cursor: pointer;
+}
+
+#top-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* --- Mute Button Minimal --- */
+.mute-btn {
+    position: absolute;
+    top: 50px;
+    right: 15px;
+    font-size: 24px;
+    background: rgba(0,0,0,0.2);
+    color: #fff;
+    padding: 6px 10px;
+    opacity: 0.5;
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.3s;
+}
+.mute-btn:hover { background: rgba(0,0,0,0.3); }
+
+/* --- Gallery Section --- */
+.section { position: relative; padding: 40px 0 120px; }
+.horizontal-scroll {
+    display: flex;
+    gap: 60px;
+    padding-left: clamp(40px, 12vw, 180px);
+    padding-right: clamp(40px, 10vw, 160px);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: clamp(40px, 12vw, 180px);
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+    scroll-behavior: smooth;
+}
+.horizontal-scroll * { pointer-events: none; }
+.horizontal-scroll { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.4) transparent; }
+.horizontal-scroll::-webkit-scrollbar { height: 6px; }
+.horizontal-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.4); border-radius: 10px; }
+
+.item { flex: 0 0 auto; width: 420px; scroll-snap-align: start; }
+.item img { width: 100%; height: 60vh; object-fit: contain; margin-bottom: 16px; -webkit-user-drag: none; ; cursor: pointer; }
+.item h2 { font-size: 20px; font-weight: 400; margin: 0 0 8px; }
+.item p { font-size: 14px; opacity: 0.7; line-height: 1.6; }
+
+@media (max-width: 768px) {
+    .item { width: 80vw; }
+    .item img { height: 50vh; }
+}
+
+.rotate-landscape { transform: rotate(90deg); }
+.spacing-wide { padding-left: 60px; padding-right: 60px; }
+.horizontal-scroll.dragging { cursor: grabbing; }
+
+.scroll-btn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(255,255,255,0.2); border: none; color: #fff;
+    font-size: 40px; padding: 10px 15px; cursor: pointer; z-index: 100; border-radius: 6px;
+    transition: background 0.3s;
+}
+.scroll-btn:hover { background: rgba(255,255,255,0.5); }
+.scroll-btn.left { left: 20px; }
+.scroll-btn.right { right: 20px; }
+
+/* Lightbox */
+.lightbox { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95);
+    display:flex; justify-content:center; align-items:center; opacity:0; pointer-events:none; transition: opacity 0.3s ease; z-index: 9999; }
+.lightbox.active { opacity:1; pointer-events:auto; }
+.lightbox img { max-width:90%; max-height:90%; object-fit:contain; border-radius:6px; }
+.lightbox .close { position:absolute; top:20px; right:30px; font-size:30px; color:#fff; cursor:pointer; font-weight:bold; z-index:10000; }
+/* ===== Grid Gallery ===== */
+.gallery-section {
+    padding: clamp(60px, 8vw, 140px);
+}
+
+.gallery-title {
+    font-size: clamp(32px, 4vw, 50px);
+    margin-bottom: 40px;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 24px;
+}
+
+.gallery-grid img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.gallery-grid img:hover {
+    transform: scale(1.03);
+    opacity: 0.9;
+}
+/* ===== Lightbox Zoom ===== */
+.lightbox img {
+    cursor: grab;
+    transform-origin: center center;
+    transition: transform 0.15s ease;
+}
+
+.lightbox img.dragging {
+    cursor: grabbing;
+}
+/* ===== Gallery Toggle ===== */
+.gallery-wrapper {
+    overflow: hidden;
+    transition: max-height 0.6s ease;
+}
+
+/* ซ่อน (แสดงแค่บางส่วน) */
+.gallery-wrapper.collapsed {
+    max-height: 600px; /* ปรับได้ ว่าจะโชว์กี่แถว */
+    mask-image: linear-gradient(to bottom, black 70%, transparent);
+}
+
+/* แสดงทั้งหมด */
+.gallery-wrapper.expanded {
+    max-height: 3000px; /* ค่าสูงๆ ให้พอ */
+    mask-image: none;
+}
+
+.gallery-toggle {
+    margin: 40px auto 0;
+    display: block;
+    background: none;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.4);
+    padding: 12px 32px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 40px;
+    transition: all 0.3s ease;
+}
+
+.gallery-toggle:hover {
+    background: rgba(255,255,255,0.1);
+}
+/* ===== Folder Section ===== */
+.folder-section {
+    padding: clamp(60px, 8vw, 140px);
+}
+
+.folder-title {
+    font-size: clamp(36px, 4vw, 52px);
+    margin-bottom: 40px;
+}
+
+/* Folder Grid (4 รูป) */
+.folder-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+}
+
+.folder {
+    cursor: pointer;
+    text-align: center;
+}
+
+.folder img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 6px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.folder:hover img {
+    transform: scale(1.05);
+    opacity: 0.85;
+}
+
+.folder span {
+    display: block;
+    margin-top: 12px;
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+/* Folder Content */
+.folder-content {
+    display: none;
+    margin-top: 40px;
+}
+
+.folder-content.active {
+    display: block;
+}
+
+.back-btn {
+    background: none;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.4);
+    padding: 8px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 900px) {
+    .folder-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ===== Lightbox Navigation ===== */
+.lightbox .nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 48px;
+    cursor: pointer;
+    opacity: 0.5;
+    padding: 20px;
+    transition: opacity 0.3s ease;
+    z-index: 10000;
+}
+
+.lightbox .nav:hover {
+    opacity: 1;
+}
+
+.lightbox .prev { left: 20px; }
+.lightbox .next { right: 20px; }
+
+/* ===== VIDEO CAROUSEL ===== */
+.video-carousel-section {
+    padding: 120px 0;
+    position: relative;
+}
+
+.carousel-title {
+    text-align: center;
+    font-size: 42px;
+    margin-bottom: 60px;
+}
+
+.video-carousel {
+    display: flex;
+    gap: 60px;
+    overflow-x: auto;
+    padding: 40px 20vw;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+.video-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.video-card {
+    position: relative;
+    flex: 0 0 320px;
+    height: 460px;
+    scroll-snap-align: center;
+    border-radius: 20px;
+    overflow: hidden;
+    transform: scale(0.85);
+    filter: blur(2px) brightness(0.7);
+    transition: all 0.4s ease;
+}
+
+.video-card video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ตัวที่อยู่ตรงกลาง */
+.video-card.active {
+    transform: scale(1.15);
+    filter: none;
+    z-index: 10;
+    box-shadow: 0 40px 120px rgba(0,0,0,0.6);
+}
+
+/* ปุ่มเสียง */
+.mute-toggle {
+    position: absolute;
+    bottom: 18px;
+    right: 18px;
+    background: rgba(0,0,0,0.6);
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    padding: 8px 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 20;
+}
+/* ===== Expanded Video (No Crop) ===== */
+.video-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.video-lightbox.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.video-lightbox video {
+    max-width: 90vw;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    object-fit: contain !important; /* ⭐ ไม่ crop */
+}
+
+/* ===== FULLSCREEN VIDEO SECTION ===== */
+.fullscreen-video-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: #000;
+    overflow: hidden;
+}
+
+.fullscreen-video-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background:transparent; /* สีพื้นตอนมีขอบ */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fullscreen-video-section video {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: scale-down; /* ✅ ไม่ crop */
+}
+
+
+/* ปุ่ม mute minimal */
+.fullscreen-mute {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    font-size: 22px;
+    background: rgba(0,0,0,0.4);
+    padding: 10px 14px;
+    border-radius: 50%;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+    user-select: none;
+}
+
+.fullscreen-mute:hover {
+    opacity: 1;
+}
+/* ===== FULLSCREEN IMAGE SECTION ===== */
+.fullscreen-image-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background: transparent; /* ขอบดำ */
+}
+
+.fullscreen-image-section img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* ⭐ สำคัญ */
+    display: block;
+}
+body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.7;
+}
+
+h1, h2, .gallery-title, .carousel-title {
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 0.5px;
+}
+
+.folder-content img {
+    pointer-events: auto;
+    cursor: zoom-in;
+}
+/* ===== TOP NAVIGATION ===== */
+.top-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 18px 40px;
+    display: flex;
+    gap: 32px;
+    z-index: 100000;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+}
+
+.top-nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.top-nav a:hover {
+    opacity: 1;
+}
+
+/* ทุกหัวข้อให้หยุดห่างจากขอบบน 100px (กำลังดี ไม่โดน Nav ทับ) */
+section, .section, .video-container {
+    scroll-margin-top: 100px; 
+}
+
+/* ยกเว้นหน้าแรก (Home) ให้ชิดขอบบนสุด */
+#home {
+    scroll-margin-top: 0px !important;
+}
+
+/* ปรับแยกตามความเหมาะสมของเนื้อหาแต่ละส่วน */
+#portfolio {
+    scroll-margin-top: 100px; /* ลดจาก 500px เหลือ 100px */
+}
+
+#gallery {
+    scroll-margin-top: 100px;
+}
+
+#character {
+    scroll-margin-top: 100px;
+}
+
+#motion {
+    scroll-margin-top: 100px;
+}
+/* ===== HOME NO OFFSET ===== */
+#home {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    scroll-margin-top: 0 !important;
+}
+
+/* ⭐ FIX ช่องว่าง element แรกหลัง HERO */
+#home + * {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+</style>
+<style>
+.contact-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  font-family: sans-serif;
+}
+
+/* ไอคอนโทรศัพท์ */
+.contact-toggle {
+  background:transparent; /* สีเขียว WhatsApp คล้าย ๆ */
+  color: #fff;
+   opacity: 30%;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* ช่องทางติดต่อที่ซ่อนก่อน */
+.contact-content {
+  display: none; /* ซ่อนก่อน */
+  margin-bottom: 10px;
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 18px;
+  line-height: 1.5;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  position: absolute;
+  bottom: 60px; /* เหนือไอคอน */
+  right: 0;
+  white-space: nowrap;
+}
+
+.contact-content a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.contact-content a:hover {
+  color: #f0c040;
+}
+.gallery-grid img,
+.item img,
+.folder img {
+  transition: transform 0.4s ease, filter 0.4s ease, box-shadow 0.4s ease;
+}
+
+.gallery-grid img:hover,
+.item img:hover,
+.folder img:hover {
+  transform: scale(1.05) rotate(-1deg);
+  filter: brightness(1.1);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+}
+.video-card {
+  transition: transform 0.4s ease, filter 0.4s ease, box-shadow 0.4s ease;
+}
+
+.video-card.active {
+  transform: scale(1.15);
+  filter: brightness(1);
+  box-shadow: 0 40px 120px rgba(0,0,0,0.6);
+}
+.video-container video {
+  transition: transform 0.5s ease;
+}
+
+.video-container:hover video {
+  transform: scale(1.02);
+}
+</style>
+</head>
+<body>
+  <!-- 1️⃣ Background video (fixed อยู่หลังสุด) -->
+    <div class="bg-video">
+        <video autoplay muted loop playsinline>
+            <source src="loop.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- 2️⃣ HERO VIDEO (ต้องเป็น content แรก) -->
+    <div class="video-container" id="home">
+        <video id="top-video" loop muted playsinline>
+            <source src="port video.mp4" type="video/mp4">
+        </video>
+        <div class="mute-btn" id="mute-btn">🔇</div>
+    </div>
+
+    <!-- 3️⃣ TOP NAV (fixed ทับ hero ได้) -->
+    <nav class="top-nav">
+        <a href="#home">Home</a>
+        <a href="#portfolio">Poster</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#character">Character</a>
+        <a href="#motion">Motion</a>
+        <a href="#musicvideo">Music Video</a>
+    </nav>
+
+    <div class="video-lightbox" id="videoLightbox">
+    <video controls autoplay></video>
+</div> 
+
+    <!-- --- หัวข้อ Gallery --- -->
+ <section class="section">
+    <h1 style="text-align:center; font-size:60px; margin-bottom:20px;">Portfolio</h1>
+    <p style="text-align:center; font-size:16px; opacity:0.7; margin-bottom:40px;">
+        แฟ้มสะสมผลงานการออกแบบกราฟิกและสื่อดิจิทัล 
+    </p>
+
+    <div class="horizontal-scroll">
+        <!-- รูปภาพต่างๆ -->
+    </div>
+</section>  
+<h1 style="text-align:left; 
+           font-size:50px; 
+           margin-bottom:1px; 
+           margin: clamp(40px, 5vh, 80px) clamp(20px, 5vw, 60px) clamp(10px, 4vh, 60px) clamp(20px, 5vw, 60px);">
+    Poster Design
+</h1>
+</section>  
+
+    <div class="horizontal-scroll">
+        <!-- รูปภาพต่างๆ -->
+    </div>
+
+</div>
+<!-- Gallery Section -->
+<div class="section">
+    <div class="horizontal-scroll"id="portfolio">
+        <div class="item"><img src="1p.png"><h2>GUNNER</h2><p>งานคอลลาจ (Collage) สไตล์ Windows 95 Retro ที่ดึงเอาองค์ประกอบของยุคอินเทอร์เน็ตช่วงต้นมาผสมผสานกับวัฒนธรรม Hip-hop สร้างความรู้สึกสนุกสนานและคิดถึงอดีต</p></div>
+        <div class="item"><img src="2p.PNG"><h2>RAPTOR</h2><p>Poster แนว Fan Art ที่นำศิลปินยุค 90s มาเล่าใหม่ในสไตล์ภาพพิมพ์ที่มี Texture แบบกระดาษเก่า ผสมผสานสัญลักษณ์ยุคนั้น เช่น เทปคาสเซ็ท เพื่อดึงกลิ่นอายความรุ่งโรจน์ของวงการเพลงไทยในอดีต</p></div>
+        <div class="item"><img src="3p.png" class="rotate-landscape spacing-wide"><h2>POSTER DAD 1</h2><p>Poster แนว Fan Art ที่นำศิลปินยุค 90s มาเล่าใหม่ในสไตล์ภาพพิมพ์ที่มี Texture แบบกระดาษเก่า ผสมผสานสัญลักษณ์ยุคนั้น เช่น เทปคาสเซ็ท เพื่อดึงกลิ่นอายความรุ่งโรจน์ของวงการเพลงไทยในอดีต</p></div>
+        <div class="item"><img src="4p.png"><h2>POSTER DAD 2</h2><p>งานรวมภาพ (Composite Art) ที่แสดงถึงความหลากหลายของตัวตนนักศึกษาศิลปะ ใช้กราฟิกรูปดาวและเอฟเฟกต์สีสันสดใสเพื่อสื่อถึงพลังแห่งความคิดสร้างสรรค์ที่ไม่มีขีดจำกัด</p></div>
+        <div class="item"><img src="5p.png"><h2>SARAN INFO</h2><p>Editorial Poster ที่รวบรวมเรื่องราวของศิลปินแร็ปเปอร์ เน้นความเท่ด้วยฟอนต์สไตล์ Gothic/Metal และการจัดวางภาพซ้อนกัน (Layering) เพื่อเล่าเส้นทางความสำเร็จในวัยเยาว์"</p></div>
+        <div class="item"><img src="6p.png" class="rotate-landscape spacing-wide"><h2>FIRE TIGER BANNER</h2><p>งานออกแบบใบปลิวโปรโมชั่นร้านสักที่เน้นความดิบและความอาร์ต ใช้มุมกล้องแนวตั้งและการจัดวางตัวอักษรแบบมินิมอล เพื่อให้งานสักบนร่างกายโดดเด่นและดูมีระดับ</p></div>
+        <div class="item"><img src="7p.png"><h2>SINGULARITY</h2></p>Infographic Poster ที่จัดวางองค์ประกอบให้ดูเข้าใจง่าย แบ่งสัดส่วนข้อมูลชัดเจน ใช้โทนสีฟ้า-ดำเพื่อสื่อถึงพลังงานสะอาดและความพรีเมียมของเทคโนโลยีรถไฟฟ้า</div>
+        <div class="item"><img src="9p.png"><h2></h2><p>(Singularity - Eco Friendly): "สื่อประชาสัมพันธ์แนวรักษ์โลกที่เน้นความทันสมัย ใช้ภาพการส่งมอบกุญแจสื่อถึงการเริ่มต้นก้าวใหม่สู่สังคมสีเขียว (Green Community) โดยมีรถสปอร์ตสีน้ำเงินเป็นจุดเด่นเพื่อลบภาพจำเดิมๆ ว่ารถไฟฟ้าต้องดูจืดชืด"</p></div>       
+        <div class="item"><img src="10p.png"><h2></h2><p>งานออกแบบปกที่ใช้เทคนิค Typography แบบยืดตัวอักษร (Elongated Text) สร้างความรู้สึกสูงสง่าและล้ำสมัย ตัดกับภาพโลกและรถสปอร์ต ให้บรรยากาศแบบ Sci-fi ที่เน้นความยั่งยืน</p></div>    
+
+    </div>
+
+    <!-- Scroll Buttons -->
+<button type="button" class="scroll-btn left">&lt;</button>
+<button type="button" class="scroll-btn right">&gt;</button>
+
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+    <span class="close" id="lightbox-close">&times;</span>
+
+    <button type="button" class="nav prev">&#10094;</button>
+    <img src="" id="lightbox-img">
+    <button type="button" class="nav next">&#10095;</button>
+</div>
+
+<!-- ================= Grid Gallery ================= -->
+<section class="gallery-section" id="gallery">
+    <h1 class="gallery-title">Art Gallery</h1>
+
+    <!-- 🔹 Wrapper ครอบ Grid -->
+    <div class="gallery-wrapper collapsed" id="galleryWrapper">
+        <div class="gallery-grid">
+            <img src="1e.PNG">
+            <img src="2e.PNG">
+            <img src="3e.PNG">
+            <img src="22p.PNG">
+            <img src="4e.png">
+            <img src="5e.png">
+            <img src="6e.png">
+            <img src="7e.PNG">
+            <img src="26p.PNG">
+            <img src="8e.png">
+            <img src="9e.png">
+            <img src="10e.png">
+            <img src="11e.png">
+            <img src="12e.png">
+            <img src="13e.PNG">
+            <img src="14e.PNG">
+            <img src="15e.PNG">
+            <img src="17e.png">
+            <img src="18e.png">
+            <img src="19e.png">
+            <img src="20p.PNG">
+            <img src="23p.PNG">
+            <img src="24p.PNG">
+            <img src="25p.PNG">
+        </div>
+    </div>
+
+    <!-- 🔹 ปุ่มอยู่นอก wrapper -->
+  <button type="button" class="gallery-toggle" id="galleryToggle">
+    ดูเพิ่มเติม
+   </button>
+
+</section>
+<!-- ================= Folder Gallery ================= -->
+<section class="folder-section" id="character">
+    <h1 class="folder-title">Character Design</h1>
+
+    <!-- แถบโฟลเดอร์ -->
+    <div class="folder-grid">
+        <div class="folder" data-folder="char1">
+            <img src="cal/CALCULATE.zip - 1.png">
+            <span>Character Set 01</span>
+        </div>
+
+        <div class="folder" data-folder="char2">
+            <img src="poly/poly 1.png">
+            <span>Character Set 02</span>
+        </div>
+
+        <div class="folder" data-folder="char3">
+            <img src="puff/puff o.PNG">
+            <span>Character Set 03</span>
+        </div>
+
+        <div class="folder" data-folder="char4">
+            <img src="toyota/toyota t.png">
+            <span>Character Set 04</span>
+        </div>
+
+           <div class="folder" data-folder="char5">
+            <img src="20p.PNG">
+            <span>Character Set 05</span>
+        </div>
+    </div>
+
+    <!-- ================= Folder Content ================= -->
+    <div class="folder-content" id="char1">
+        <button type="button" class="back-btn">← Back</button>
+        <div class="gallery-grid">
+            <img src="cal/CALCULATE.zip - 2.png">
+            <img src="cal/CALCULATE.zip - 3.png">
+            <img src="cal/CALCULATE.zip - 4.png">
+            <img src="cal/CALCULATE.zip - 5.png">
+            <img src="cal/CALCULATE.zip - 6.png">
+            <img src="cal/CALCULATE.zip - 7.png">
+             <img src="cal/CALCULATE.zip - 8.png">
+        </div>
+    </div>
+
+    <div class="folder-content" id="char2">
+        <button type="button" class="back-btn">← Back</button>
+        <div class="gallery-grid">
+            <img src="poly/poly 2.png">
+            <img src="poly/poly 3.png">
+            <img src="poly/poly 4.png">
+            <img src="poly/poly 5.png">
+            <img src="poly/poly 6.png">
+            <img src="poly/poly 7.png">
+            <img src="poly/poly 8.png">
+            <img src="poly/poly 9.png">
+            <img src="poly/poly 10.png">
+        </div>
+    </div>
+
+    <div class="folder-content" id="char3">
+        <button type="button" class="back-btn">← Back</button>
+        <div class="gallery-grid">
+            <img src="puff/puff 1.PNG">
+            <img src="puff/puff 2.PNG">
+            <img src="puff/puff 3.PNG">
+            <img src="puff/puff 4.PNG">
+            <img src="puff/puff 5.PNG">
+            <img src="puff/puff 6.PNG">
+            <img src="puff/puff 7.PNG">
+            <img src="puff/puff 8.PNG">
+            <img src="puff/puff 9.PNG">
+            <img src="puff/puff 10.PNG">
+        </div>
+    </div>
+
+    <div class="folder-content" id="char4">
+        <button type="button" class="back-btn">← Back</button>
+
+        <div class="gallery-grid">
+            <img src="toyota/toyota 1.PNG">
+            <img src="toyota/toyota 2.PNG">
+            <img src="toyota/toyota 3.PNG">
+        </div>
+    </div>
+
+    <div class="folder-content" id="char5">
+        <button type="button" class="back-btn">← Back</button>
+        <div class="gallery-grid">
+            <img src="mv/m2.PNG">
+            <img src="mv/m3.PNG">
+            <img src="mv/m4.PNG">
+            <img src="mv/m5.PNG">
+        </div>
+    </div>
+    <section class="video-carousel-section" id="motion">
+    <h1 class="carousel-title">Motion Graphic</h1>
+
+    <div class="video-carousel" id="videoCarousel">
+        <div class="video-card active">
+            <video src="Fhero.mov" muted loop></video>
+            <button type="button" class="mute-toggle">🔇</button>
+        </div>
+
+        <div class="video-card">
+            <video src="kitty.mov" muted loop></video>
+            <button type="button" class="mute-toggle">🔇</button>
+
+        </div>
+
+
+        <div class="video-card">
+            <video src="tsuna 2.mov" muted loop></video>
+            <button type="button" class="mute-toggle">🔇</button>
+
+        </div>
+        
+        <div class="video-card">
+            <video src="boxing.mov" muted loop></video>
+            <button type="button" class="mute-toggle">🔇</button>
+
+        </div>
+
+        <div class="video-card">
+            <video src="Calculate house final.mov" muted loop></video>
+            <button type="button" class="mute-toggle">🔇</button>
+
+        </div>
+
+
+        <div class="video-card">
+            <video src="ben 10.mov" muted loop></video>
+            <button type="button" class="mute-toggle">🔇</button>
+
+        </div>
+
+     <div class="video-card">
+            <video src="what up.mov" muted loop></video>
+            <button type="button" class="mute-toggle">🔇</button>
+
+        </div>
+
+        <div class="video-card">
+            <video src="p4aa_3.mp4" muted loop></video>
+            <button type="button" class="mute-toggle">🔇</button>
+
+        </div>
+
+        <div class="video-card">
+            <video src="sing.mp4" muted loop></video>
+            <button type="button" class="mute-toggle">🔇</button>
+
+        </div>
+    </div>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- ===== Fullscreen Image Section ===== -->
+<section class="fullscreen-image-section">
+    <img src="mv pic.PNG" alt="Fullscreen Artwork">
+</section>
+<h1 style="text-align:left; 
+           font-size:50px; 
+           margin-bottom:1px; 
+           margin: clamp(40px, 5vh, 80px) clamp(20px, 5vw, 60px) clamp(10px, 4vh, 60px) clamp(20px, 5vw, 60px);">
+    Animate Music Video
+</h1>
+<p>เพลงเสี้ยววินาที "bodyslam"</p>
+    <!-- ===== Fullscreen Video Section ===== -->
+<section class="fullscreen-video-section" id="musicvideo" >
+    <video id="fullscreenVideo" muted playsinline >
+        <source src="music video final (แก้ไขแล้ว).mov" type="video/mp4">
+    </video>
+
+    <div class="fullscreen-mute" id="fullscreenMute">🔇</div>
+</section>
+<div class="folder" data-folder="char1">
+<div class="contact-widget">
+  <div class="contact-toggle" onclick="toggleContact()">contact</div>
+  <div class="contact-content" id="contactContent">
+    <p>call: 094-027-8450</p>
+    <p>email: kantapat120347@gmail.com</p>
+    <p><a href="https://www.instagram.com/l_x.png/" target="_blank">Instagram</a></p>
+  </div>
+</div>
+
+
+
+<script>
+/* ================= GLOBAL FIX ================= */
+document.documentElement.style.overflowAnchor = 'none';
+
+/* ================= TOP VIDEO ================= */
+const topVideo = document.getElementById('top-video');
+document.querySelector('.video-container').addEventListener('click', () => {
+    topVideo.paused ? topVideo.play() : topVideo.pause();
+});
+
+const muteBtn = document.getElementById('mute-btn');
+muteBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    topVideo.muted = !topVideo.muted;
+    muteBtn.innerHTML = topVideo.muted ? '🔇' : '🔊';
+});
+
+/* ================= HORIZONTAL DRAG ================= */
+document.querySelectorAll('.horizontal-scroll').forEach(slider => {
+    let isDown = false;
+    let startX = 0;
+    let startScroll = 0;
+    let velocity = 0;
+    let raf = null;
+
+    slider.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        isDown = true;
+        startX = e.clientX;
+        startScroll = slider.scrollLeft;
+        velocity = 0;
+        slider.classList.add('dragging');
+        slider.setPointerCapture(e.pointerId);
+        if (raf) cancelAnimationFrame(raf);
+    });
+
+    slider.addEventListener('pointermove', e => {
+        if (!isDown) return;
+        const dx = e.clientX - startX;
+        const prev = slider.scrollLeft;
+        slider.scrollLeft = startScroll - dx;
+        velocity = slider.scrollLeft - prev;
+    });
+
+    slider.addEventListener('pointerup', () => {
+        isDown = false;
+        slider.classList.remove('dragging');
+
+        const momentum = () => {
+            slider.scrollLeft += velocity;
+            velocity *= 0.95;
+            if (Math.abs(velocity) > 0.5) {
+                raf = requestAnimationFrame(momentum);
+            }
+        };
+        momentum();
+    });
+
+    slider.addEventListener('pointercancel', () => {
+        isDown = false;
+        slider.classList.remove('dragging');
+    });
+});
+
+/* ================= LIGHTBOX IMAGE ================= */
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightbox-img');
+const closeBtn = document.getElementById('lightbox-close');
+const prevBtn = document.querySelector('.lightbox .prev');
+const nextBtn = document.querySelector('.lightbox .next');
+
+let currentGroup = [];
+let currentIndex = 0;
+let scale = 1, posX = 0, posY = 0;
+let isPanning = false, startPanX = 0, startPanY = 0;
+
+function resetZoom() {
+    scale = 1;
+    posX = 0;
+    posY = 0;
+    lightboxImg.style.transform = 'translate(0,0) scale(1)';
+}
+
+function openLightbox(group, index) {
+    currentGroup = group;
+    currentIndex = index;
+    lightboxImg.src = currentGroup[currentIndex].src;
+    lightbox.classList.add('active');
+    resetZoom();
+}
+
+function showImage(index) {
+    if (index < 0) index = currentGroup.length - 1;
+    if (index >= currentGroup.length) index = 0;
+    currentIndex = index;
+    lightboxImg.src = currentGroup[currentIndex].src;
+    resetZoom();
+}
+
+prevBtn.onclick = () => showImage(currentIndex - 1);
+nextBtn.onclick = () => showImage(currentIndex + 1);
+closeBtn.onclick = () => lightbox.classList.remove('active');
+
+lightbox.addEventListener('click', e => {
+    if (e.target === lightbox) lightbox.classList.remove('active');
+});
+
+document.querySelectorAll('.gallery-grid img, .folder-content img, .item img').forEach(img => {
+    img.addEventListener('click', e => {
+        e.stopPropagation(); // ⭐ สำคัญมาก
+        
+        const container =
+            img.closest('.folder-content') ||
+            img.closest('.gallery-grid') ||
+            img.closest('.horizontal-scroll');
+
+        const group = container
+            ? Array.from(container.querySelectorAll('img'))
+            : [img];
+
+        openLightbox(group, group.indexOf(img));
+    });
+});
+
+lightboxImg.addEventListener('wheel', e => {
+    e.preventDefault();
+    scale += e.deltaY * -0.0015;
+    scale = Math.min(Math.max(1, scale), 5);
+    lightboxImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+});
+
+lightboxImg.addEventListener('mousedown', e => {
+    if (scale <= 1) return;
+    isPanning = true;
+    startPanX = e.clientX - posX;
+    startPanY = e.clientY - posY;
+});
+
+window.addEventListener('mousemove', e => {
+    if (!isPanning) return;
+    posX = e.clientX - startPanX;
+    posY = e.clientY - startPanY;
+    lightboxImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+});
+
+window.addEventListener('mouseup', () => isPanning = false);
+
+/* ================= VIDEO CAROUSEL ================= */
+const carousel = document.getElementById('videoCarousel');
+const cards = document.querySelectorAll('.video-card');
+let currentActive = document.querySelector('.video-card.active');
+
+function setActiveCard(card) {
+    if (card === currentActive) return;
+    currentActive = card;
+
+    cards.forEach(c => {
+        c.classList.remove('active');
+        const v = c.querySelector('video');
+        v.pause();
+        v.currentTime = 0;
+        v.muted = true;
+        c.querySelector('.mute-toggle').textContent = '🔇';
+    });
+
+    card.classList.add('active');
+    const video = card.querySelector('video');
+    video.play();
+}
+
+cards.forEach(card => {
+    const video = card.querySelector('video');
+    const mute = card.querySelector('.mute-toggle');
+
+    card.addEventListener('click', () => {
+        setActiveCard(card);
+
+        const left = card.offsetLeft - (carousel.offsetWidth / 2) + (card.offsetWidth / 2);
+        carousel.scrollTo({ left, behavior: 'smooth' });
+    });
+
+    mute.addEventListener('click', e => {
+        e.stopPropagation();
+        video.muted = !video.muted;
+        mute.textContent = video.muted ? '🔇' : '🔊';
+    });
+
+    card.addEventListener('dblclick', () => {
+        const box = document.getElementById('videoLightbox');
+        const boxVideo = box.querySelector('video');
+        boxVideo.src = video.src;
+        boxVideo.currentTime = video.currentTime;
+        boxVideo.muted = video.muted;
+        boxVideo.play();
+        box.classList.add('active');
+    });
+});
+
+setActiveCard(currentActive);
+
+document.getElementById('videoLightbox').addEventListener('click', e => {
+    if (e.target.tagName === 'VIDEO') return;
+    const v = e.currentTarget.querySelector('video');
+    v.pause();
+    v.src = '';
+    e.currentTarget.classList.remove('active');
+});
+
+/* ================= FULLSCREEN VIDEO ================= */
+const fsVideo = document.getElementById('fullscreenVideo');
+const fsMute = document.getElementById('fullscreenMute');
+
+fsVideo.addEventListener('click', () => {
+    fsVideo.paused ? fsVideo.play() : fsVideo.pause();
+});
+
+fsMute.addEventListener('click', e => {
+    e.stopPropagation();
+    fsVideo.muted = !fsVideo.muted;
+    fsMute.textContent = fsVideo.muted ? '🔇' : '🔊';
+});
+/* ================= GALLERY TOGGLE ================= */
+const galleryWrapper = document.getElementById('galleryWrapper');
+const galleryToggle = document.getElementById('galleryToggle');
+
+if (galleryWrapper && galleryToggle) {
+    galleryToggle.addEventListener('click', () => {
+        const isCollapsed = galleryWrapper.classList.contains('collapsed');
+
+        galleryWrapper.classList.toggle('collapsed', !isCollapsed);
+        galleryWrapper.classList.toggle('expanded', isCollapsed);
+
+        galleryToggle.textContent = isCollapsed ? 'ซ่อน' : 'ดูเพิ่มเติม';
+    });
+}
+/* ================= SCROLL BUTTONS ================= */
+document.querySelectorAll('.section').forEach(section => {
+    const slider = section.querySelector('.horizontal-scroll');
+    const leftBtn = section.querySelector('.scroll-btn.left');
+    const rightBtn = section.querySelector('.scroll-btn.right');
+
+    if (!slider || !leftBtn || !rightBtn) return;
+
+    leftBtn.addEventListener('click', () => {
+        slider.scrollBy({ left: -slider.clientWidth * 0.8, behavior: 'smooth' });
+    });
+
+    rightBtn.addEventListener('click', () => {
+        slider.scrollBy({ left: slider.clientWidth * 0.8, behavior: 'smooth' });
+    });
+});
+/* ================= FOLDER GALLERY ================= */
+const folders = document.querySelectorAll('.folder');
+const folderContents = document.querySelectorAll('.folder-content');
+const backButtons = document.querySelectorAll('.back-btn');
+
+folders.forEach(folder => {
+    folder.addEventListener('click', () => {
+        const targetId = folder.dataset.folder;
+
+    
+        document.querySelector('.folder-grid').style.display = 'none';
+
+        
+        folderContents.forEach(c => c.classList.remove('active'));
+
+      
+        const target = document.getElementById(targetId);
+        if (target) target.classList.add('active');
+    });
+});
+
+backButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        folderContents.forEach(c => c.classList.remove('active'));
+        document.querySelector('.folder-grid').style.display = 'grid';
+    });
+});
+
+</script>
+<script>
+function toggleContact() {
+  const content = document.getElementById('contactContent');
+  if (content.style.display === "block") {
+    content.style.display = "none";
+  } else {
+    content.style.display = "block";
+  }
+}
+</script>

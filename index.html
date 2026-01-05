@@ -277,6 +277,24 @@ body::before {
     cursor: pointer;
     margin-bottom: 30px;
 }
+
+.top-nav a.active {
+    opacity: 1;
+    position: relative;
+}
+
+.top-nav a.active::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    transform: translateX(-50%);
+} 
+
 @media (max-width: 768px) {
     .top-nav {
         top: 10px;
@@ -310,6 +328,17 @@ body::before {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+@media (max-width: 1024px) {
+    .top-nav {
+        gap: 28px;
+        padding: 12px 28px;
+    }
+
+    .top-nav a {
+        font-size: 15px;
+    }
+}
+
 
 /* ===== Lightbox Navigation ===== */
 .lightbox .nav {
@@ -430,7 +459,7 @@ body::before {
 .fullscreen-video-section {
     position: relative;
     width: 100%;
-    height: 100vh;
+    height: 50%;
     background: #000;
     overflow: hidden;
 }
@@ -438,7 +467,7 @@ body::before {
 .fullscreen-video-section {
     position: relative;
     width: 100%;
-    height: 100vh;
+    height: 100%;
     background:transparent; /* สีพื้นตอนมีขอบ */
     display: flex;
     justify-content: center;
@@ -1347,5 +1376,6 @@ document.addEventListener("DOMContentLoaded", function() {
   lazyImages.forEach(img => observer.observe(img));
 });
 </script>
+
 
 

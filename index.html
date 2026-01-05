@@ -52,7 +52,7 @@ body::before {
 .video-container {
     position: relative;
     width: 100%;
-    height: 100vh;      /* เต็ม viewport */
+    height: 100%;      /* เต็ม viewport */
     margin: 0;          /* ⭐ ตัดช่องว่าง */
     padding: 0;         /* ⭐ ตัดช่องว่าง */
     background: transparent;
@@ -286,6 +286,14 @@ body::before {
         overflow-x: auto;
         scrollbar-width: none;
     }
+      section,
+  .top-video,
+  .hero {
+    min-height: auto;
+    height: auto;
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
 
     .top-nav::-webkit-scrollbar {
         display: none;
@@ -1339,4 +1347,5 @@ document.addEventListener("DOMContentLoaded", function() {
   lazyImages.forEach(img => observer.observe(img));
 });
 </script>
+
 

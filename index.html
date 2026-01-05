@@ -55,14 +55,14 @@ body::before {
     height: 100vh;      /* เต็ม viewport */
     margin: 0;          /* ⭐ ตัดช่องว่าง */
     padding: 0;         /* ⭐ ตัดช่องว่าง */
-    background: #000;
+    background: transparent;
     cursor: pointer;
 }
 
 #top-video {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: scale-down;
     display: block;
 }
 
@@ -94,7 +94,7 @@ body::before {
     scroll-snap-type: x mandatory;
     scroll-padding-left: clamp(40px, 12vw, 180px);
     cursor: grab;
-    touch-action: pan-y;
+    touch-action: pan-x pan-y;
     user-select: none;
     -webkit-user-select: none;
     scroll-behavior: smooth;
@@ -996,7 +996,7 @@ section, .section, .video-container {
 
 <p>
   <span class="link-text" onclick="window.open('https://youtu.be/FW1PAeuXWpk?si=ORHR1LGo2lioZNk3', '_blank')">
-    วิดีโอตัวเต็มมิวสิกวิดีโอ
+    วิดีโอเต็มมิวสิกวิดีโอ
   </span>
 </p>
 
@@ -1312,5 +1312,6 @@ document.addEventListener("DOMContentLoaded", function() {
   lazyImages.forEach(img => observer.observe(img));
 });
 </script>
+
 
 

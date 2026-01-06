@@ -321,6 +321,14 @@ body::before {
         font-size: 14px;
         white-space: nowrap;
     }
+
+    .fullscreen-image-section {
+        height: 70vh;        /* ⭐ ลดความสูง */
+        min-height: 420px;   /* กันเตี้ยเกิน */
+    }
+     .fullscreen-image-section img {
+        object-fit: cover;
+    }
 }
 
 @media (max-width: 900px) {
@@ -505,7 +513,7 @@ body::before {
 .fullscreen-image-section {
     position: relative;
     width: 100%;
-    height: 100vh;
+    height: 100svh; /* mobile safe viewport */
     overflow: hidden;
     background: transparent; /* ขอบดำ */
 }
@@ -513,7 +521,7 @@ body::before {
 .fullscreen-image-section img {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* ⭐ สำคัญ */
+    object-fit: contain; /* ⭐ เปลี่ยนเป็น cover */
     display: block;
 }
 body {
@@ -682,6 +690,29 @@ section, .section, .video-container {
 .video-container:hover video {
   transform: scale(1.02);
 }
+@media (max-width: 768px) {
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+    }
+
+    .fullscreen-image-section {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    overflow: hidden;
+    background: transparent;
+}
+
+  .fullscreen-image-section img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    padding: 100px 0px;
+}
+
 </style>
 </head>
 <body>
@@ -1060,7 +1091,7 @@ section, .section, .video-container {
 
 <p>
   <span class="link-text" onclick="window.open('https://youtu.be/FW1PAeuXWpk?si=ORHR1LGo2lioZNk3', '_blank')">
-    วิดีโอตัวเต็มมิวสิกวิดีโอ
+    วิดีโอตัวเต็มผลงานมิวสิกวิดีโอ
   </span>
 </p>
 
